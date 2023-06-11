@@ -1,5 +1,5 @@
 # youtube-simulator-z
-A fully open source auto player script for https://www.roblox.com/games/11109756592/YouTube-Simulator-Z<br>
+A fully open source auto farm script for https://www.roblox.com/games/11109756592/YouTube-Simulator-Z<br>
 
 ## Reporting bugs
 You can open up an issue on the GitHub or you may message me on v3rmillion / Discord.<br>
