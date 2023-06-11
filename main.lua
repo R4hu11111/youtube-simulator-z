@@ -116,7 +116,7 @@ do
 									task.wait(.5)
 								else
 									if workspace.Studio:FindFirstChild("Door") then
-										client.Character:PivotTo(workspace.Studio.Door:GetPivot())
+										client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
 									end
 								end
 								task.wait(0.1)
