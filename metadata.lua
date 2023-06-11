@@ -1,5 +1,5 @@
 return {
-	version = '2.0a',
-	updated = '6/10/23',
-	message = 'major internal scripting changes'
+	version = '2.1b',
+	updated = '6/11/23',
+	message = 'minor bug fixes + sd percentage'
 }
