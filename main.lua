@@ -1,6 +1,7 @@
 local start = tick()
 local client = game:GetService('Players').LocalPlayer;
 local set_identity = (type(syn) == 'table' and syn.set_thread_identity) or setidentity or setthreadcontext
+local getsenv = getsenv
 local executor = identifyexecutor and identifyexecutor() or 'Unknown'
 
 local function fail(r) return client:Kick(r) end
@@ -36,12 +37,92 @@ local function urlLoad(url)
 end
 
 if type(set_identity) ~= 'function' then return fail('Unsupported exploit (missing "set_thread_identity")') end
+if type(getsenv) ~= 'function' then return fail('Unsupported exploit (missing "getsenv")') end
+
+local getinfo = debug.getinfo or getinfo;
+local getupvalues = debug.getupvalues or getupvalues;
+
+if type(getupvalues) ~= 'function' then return fail('Unsupported exploit (missing "debug.getupvalues")') end
+
+-- free exploit bandaid fix
+if type(getinfo) ~= 'function' then
+	local debug_info = debug.info;
+	if type(debug_info) ~= 'function' then
+		-- if your exploit doesnt have getrenv you have no hope
+		if type(getrenv) ~= 'function' then return fail('Unsupported exploit (missing "getrenv")') end
+		debug_info = getrenv().debug.info
+	end
+	getinfo = function(f)
+		assert(type(f) == 'function', string.format('Invalid argument #1 to debug.getinfo (expected %s got %s', 'function', type(f)))
+		local results = { debug.info(f, 'slnfa') }
+		local _, upvalues = pcall(getupvalues, f)
+		if type(upvalues) ~= 'table' then
+			upvalues = {}
+		end
+		local nups = 0
+		for k in next, upvalues do
+			nups = nups + 1
+		end
+		-- winning code
+		return {
+			source      = '@' .. results[1],
+			short_src   = results[1],
+			what        = results[1] == '[C]' and 'C' or 'Lua',
+			currentline = results[2],
+			name        = results[3],
+			func        = results[4],
+			numparams   = results[5],
+			is_vararg   = results[6], -- 'a' argument returns 2 values :)
+			nups        = nups,     
+		}
+	end
+end
 
 local UI = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/Library.lua")
 local themeManager = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/addons/ThemeManager.lua")
 
 local metadata = urlLoad("https://raw.githubusercontent.com/bardium/youtube-simulator-z/main/metadata.lua")
 local httpService = game:GetService('HttpService')
+
+local clickEvent = nil
+local counter = 0
+
+while true do
+	set_identity(7)
+
+	for _, v in pairs(getsenv(client.PlayerGui.Camera.LocalScript)) do
+		if typeof(v) == "function" then
+			for l, z in pairs(getupvalues(v)) do
+				if typeof(z) == "table" then
+					for x, y in pairs(z) do
+						if typeof(y) == "Instance" and y:IsA("BindableEvent") then
+							clickEvent = y
+						end
+					end
+				end
+			end
+		end
+	end
+
+	local clamScript = client.PlayerGui:WaitForChild("NewBideo"):WaitForChild("LocalScript")
+	local clam = clamScript.CLAM:Clone()
+	clam.N.Text = ""
+	require(game.ReplicatedStorage.Modules.OPOP).PEE = clam
+	require(game.ReplicatedStorage.Modules.OPOP).COPY = nil
+	require(game.ReplicatedStorage.Modules.OPOP).COPY = (function()
+		local clam = clamScript.CLAM:Clone()
+		clam.N.Text = ""
+	end)
+	
+	if (require(game.ReplicatedStorage.Modules.OPOP).PEE ~= nil and typeof(clickEvent) == "Instance") then
+		break
+	end
+
+	counter = counter + 1
+	if counter > 6 then
+		fail(string.format('Failed to load game dependencies. Details: %s, %s, %s', type(framework), typeof(scrollHandler), type(network)))
+	end
+end
 
 local runService = game:GetService('RunService')
 local userInputService = game:GetService('UserInputService')
@@ -82,17 +163,6 @@ do
 	shared._id = httpService:GenerateGUID(false)
 
 	set_identity(7)
-	if require(game.ReplicatedStorage.Modules.OPOP).PEE == nil then
-		local clamScript = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("NewBideo"):WaitForChild("LocalScript")
-		local clam = clamScript.CLAM:Clone()
-		clam.N.Text = ""
-		require(game.ReplicatedStorage.Modules.OPOP).PEE = clam
-		require(game.ReplicatedStorage.Modules.OPOP).COPY = nil
-		require(game.ReplicatedStorage.Modules.OPOP).COPY = (function()
-			local clam = clamScript.CLAM:Clone()
-			clam.N.Text = ""
-		end)
-	end
 	local thread = task.spawn(function()
 		while true do
 			task.wait()
@@ -105,7 +175,7 @@ do
 						if workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) then
 							repeat
 								if workspace.Studio.Items:FindFirstChild("Shop Teleporter") then
-									game.Players.LocalPlayer.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
+									client.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
 									task.wait(.5)
 								else
 									if workspace.Studio:FindFirstChild("Door") then
@@ -123,16 +193,16 @@ do
 						until client.Character:FindFirstChild("Handle") or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 					end
 					task.wait()
+					set_identity(7)
 					repeat
-						set_identity(7)
-						task.wait()
-						virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-						task.wait()
-						game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailStart:FireServer()
-						task.wait()
-						game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
-						task.wait()
-						virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+						task.spawn(function()
+							game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailStart:FireServer()
+							task.wait()
+							game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
+						end)
+						task.spawn(function()
+							clickEvent:Fire({["UserInputType"] = Enum.UserInputType.Keyboard, ["KeyCode"] = Enum.KeyCode.E})
+						end)
 						task.wait()
 					until client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X >= (-0.51 + ((Options.SDPercentage.Value) / 100)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 				end
