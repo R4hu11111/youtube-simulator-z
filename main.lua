@@ -201,9 +201,15 @@ do
 							game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
 						end)
 						task.spawn(function()
-							clickEvent:Fire({["UserInputType"] = Enum.UserInputType.Keyboard, ["KeyCode"] = Enum.KeyCode.E})
+							if Options.InputMode.Value == 'virtual input' then
+								virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+								task.wait()
+								virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+							else
+								clickEvent:Fire({["UserInputType"] = Enum.UserInputType.Keyboard, ["KeyCode"] = Enum.KeyCode.E})
+							end
 						end)
-						task.wait()
+						task.wait(Options.ClickDelay.Value)
 					until client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X >= (-0.51 + ((Options.SDPercentage.Value) / 100)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 				end
 				task.wait()
@@ -559,6 +565,14 @@ Tabs.Miscellaneous = Window:AddTab('Miscellaneous')
 
 Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 	Groups.AutoFarm:AddToggle('AutoFarm',			{ Text = 'AutoFarm' }):AddKeyPicker('AutoFarmBind', { Default = 'End', NoUI = true, SyncToggleState = true })
+	Groups.AutoFarm:AddDropdown('InputMode', {
+		Text = 'Input mode', 
+		Compact = true, 
+		Default = 'event fire', 
+		Values = { 'event fire', 'virtual input' }, 
+		Tooltip = 'Input method used to press arrows.\n* event fire: fires the click event directly.\n* virtual input: emulates key presses. use if "event fire" does not work.', 
+	})
+	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.025, Rounding = 3, Compact = true, Suffix = 's' })
 	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2, Max = 100, Default = 100, Suffix = '%', Rounding = 0, Compact = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
