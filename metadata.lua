@@ -1,5 +1,5 @@
 return {
-	version = '2.2b',
+	version = '2.2c',
 	updated = '6/17/23',
-	message = 'faster clicking for camera sd'
+	message = 'delay for clicking on camera sd'
 }
