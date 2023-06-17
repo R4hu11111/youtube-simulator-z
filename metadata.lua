@@ -1,5 +1,5 @@
 return {
-	version = '2.2a',
+	version = '2.2b',
 	updated = '6/17/23',
-	message = 'trash exploit exclusion + auto open chest'
+	message = 'faster clicking for camera sd'
 }
