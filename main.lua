@@ -35,7 +35,7 @@ local function urlLoad(url)
 	return unpack(results, 2)
 end
 
-if type(set_identity) ~= 'function' then return warn("Many features won't work due to your executor lacking the 'set_thread_identity' function") end
+if type(set_identity) ~= 'function' then return fail('Unsupported exploit (missing "set_thread_identity")') end
 
 local UI = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/Library.lua")
 local themeManager = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/addons/ThemeManager.lua")
@@ -50,13 +50,8 @@ local virtualInputManager = game:GetService('VirtualInputManager')
 local pressButton do
 	function pressButton(button)
 		if (typeof(button) ~= "Instance") or (not button:IsA("ImageButton")) then return end
-		if set_identity then
-			set_identity(2)
-			require(game.ReplicatedStorage.Modules.Float).new(button):Click()
-		else
-			virtualInputManager:SendMouseButtonEvent(button.AbsolutePosition.X + button.AbsoluteSize.X / 2, button.AbsolutePosition.Y + 50, 0, true, button, 1)
-			virtualInputManager:SendMouseButtonEvent(button.AbsolutePosition.X + button.AbsoluteSize.X / 2, button.AbsolutePosition.Y + 50, 0, false, button, 1)
-		end
+		set_identity(2)
+		require(game.ReplicatedStorage.Modules.Float).new(button):Click()
 	end
 end
 
@@ -86,9 +81,7 @@ do
 
 	shared._id = httpService:GenerateGUID(false)
 
-	if set_identity then
-		set_identity(7)
-	end
+	set_identity(7)
 	if require(game.ReplicatedStorage.Modules.OPOP).PEE == nil then
 		local clamScript = game:GetService("Players").LocalPlayer.PlayerGui:WaitForChild("NewBideo"):WaitForChild("LocalScript")
 		local clam = clamScript.CLAM:Clone()
@@ -131,9 +124,7 @@ do
 					end
 					task.wait()
 					repeat
-						if set_identity then
-							set_identity(7)
-						end
+						set_identity(7)
 						task.wait()
 						virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
 						task.wait()
@@ -157,15 +148,13 @@ do
 						client.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
 						task.wait(0.1)
 					until workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
-					if set_identity then
-						local replaceWithBest = nil
-						for _, v in ipairs(client.PlayerGui:GetChildren()) do
-							if v:IsA("BillboardGui") and v.Enabled == true and v.Name == "BillboardGui" and v:FindFirstChild("Frame") and v.Frame.Size == UDim2.new(1, 0, 1, 0) and v.Frame:FindFirstChild("ImageButton") and v.Frame.ImageButton:FindFirstChild("TextLabel") and string.lower(v.Frame.ImageButton.TextLabel.Text):match("replace with best") then
-								replaceWithBest = v.Frame.ImageButton
-							end
+					local replaceWithBest = nil
+					for _, v in ipairs(client.PlayerGui:GetChildren()) do
+						if v:IsA("BillboardGui") and v.Enabled == true and v.Name == "BillboardGui" and v:FindFirstChild("Frame") and v.Frame.Size == UDim2.new(1, 0, 1, 0) and v.Frame:FindFirstChild("ImageButton") and v.Frame.ImageButton:FindFirstChild("TextLabel") and string.lower(v.Frame.ImageButton.TextLabel.Text):match("replace with best") then
+							replaceWithBest = v.Frame.ImageButton
 						end
-						pressButton(replaceWithBest)
 					end
+					pressButton(replaceWithBest)
 				end
 				task.wait()
 				if client.PlayerGui.Computer.Frame.Visible == false and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
@@ -182,15 +171,13 @@ do
 										ChairInstance.CanCollide = false
 									end
 								end
-								if set_identity then
-									local replaceWithBest = nil
-									for _, v in ipairs(client.PlayerGui:GetChildren()) do
-										if v:IsA("BillboardGui") and v.Enabled == true and v.Name == "BillboardGui" and v:FindFirstChild("Frame") and v.Frame.Size == UDim2.new(1, 0, 1, 0) and v.Frame:FindFirstChild("ImageButton") and v.Frame.ImageButton:FindFirstChild("TextLabel") and string.lower(v.Frame.ImageButton.TextLabel.Text):match("replace with best") then
-											replaceWithBest = v.Frame.ImageButton
-										end
+								local replaceWithBest = nil
+								for _, v in ipairs(client.PlayerGui:GetChildren()) do
+									if v:IsA("BillboardGui") and v.Enabled == true and v.Name == "BillboardGui" and v:FindFirstChild("Frame") and v.Frame.Size == UDim2.new(1, 0, 1, 0) and v.Frame:FindFirstChild("ImageButton") and v.Frame.ImageButton:FindFirstChild("TextLabel") and string.lower(v.Frame.ImageButton.TextLabel.Text):match("replace with best") then
+										replaceWithBest = v.Frame.ImageButton
 									end
-									pressButton(replaceWithBest)
 								end
+								pressButton(replaceWithBest)
 								repeat
 									client.Character:PivotTo(Seat:GetPivot())
 									task.wait(1)
@@ -231,9 +218,7 @@ do
 						task.wait(.1)
 						local video = game.ReplicatedStorage.Remotes.Functions.BeginVIdeo:InvokeServer()
 						local videoLength = 0
-						if set_identity then
-							set_identity(2)
-						end
+						set_identity(2)
 						local currentComptuer = require(game.ReplicatedStorage.Modules.Computers)[require(game.ReplicatedStorage.Modules.CurrentComputer).Computer]
 						local currentComputerSDPer = require(game.ReplicatedStorage.Modules.Formula).SDPerComputer(currentComptuer)
 						local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
@@ -279,6 +264,41 @@ do
 						client.PlayerGui:FindFirstChild("editingVideoGui"):Destroy()
 					end
 				end
+			end
+		end
+	end)
+	table.insert(shared.callbacks, function()
+		pcall(task.cancel, thread)
+	end)
+end
+
+-- Auto chest opener
+do
+	local thread = task.spawn(function()
+		while true do
+			task.wait()
+			if Toggles.AutoOpenChests and Toggles.AutoOpenChests.Value then
+				UI:Notify("Started opening chests! (make sure to have chest gui open)", 5)
+				local startTime = tick()
+
+				local chestGui = nil
+				for _, v in ipairs(client.PlayerGui:GetChildren()) do
+					if v.Name == "Chest" and v:FindFirstChild("b") and v:FindFirstChild("C") then
+						chestGui = v
+					end
+				end
+				local openChestButton = chestGui:WaitForChild("b"):WaitForChild("ImageButton")
+
+				if chestGui.C.C.TextLabel.TextLabel.TextLabel.Text ~= "0" then
+					set_identity(2)
+					repeat
+						require(game.ReplicatedStorage.Modules.Float).new(openChestButton):Click()
+						task.wait()
+					until chestGui.C.C.TextLabel.TextLabel.TextLabel.Text == "0"
+					set_identity(7)
+				end
+				Toggles.AutoOpenChests:SetValue(false)
+				UI:Notify(string.format('Finished opening chests in %.4f second(s)!', tick() - startTime), 5)
 			end
 		end
 	end)
@@ -468,33 +488,36 @@ Tabs.Main = Window:AddTab('Main')
 Tabs.Miscellaneous = Window:AddTab('Miscellaneous')
 
 Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
-Groups.AutoFarm:AddToggle('AutoFarm',			{ Text = 'AutoFarm' }):AddKeyPicker('AutoFarmBind', { Default = 'End', NoUI = true, SyncToggleState = true })
-Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2, Max = 100, Default = 100, Suffix = '%', Rounding = 0, Compact = true })
+	Groups.AutoFarm:AddToggle('AutoFarm',			{ Text = 'AutoFarm' }):AddKeyPicker('AutoFarmBind', { Default = 'End', NoUI = true, SyncToggleState = true })
+	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2, Max = 100, Default = 100, Suffix = '%', Rounding = 0, Compact = true })
+
+Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
+	Groups.Misc:AddToggle('AutoOpenChests', { Text = 'Auto open chests' })
 
 Groups.Configs = Tabs.Miscellaneous:AddRightGroupbox('Configs')
 Groups.Credits = Tabs.Miscellaneous:AddRightGroupbox('Credits')
-local function addRichText(label)
-	label.TextLabel.RichText = true
-end
+	local function addRichText(label)
+		label.TextLabel.RichText = true
+	end
 
-addRichText(Groups.Credits:AddLabel('<font color="#0bff7e">Goose Better</font> - script'))
-Groups.Credits:AddLabel('wally & Inori - ui library')
+	addRichText(Groups.Credits:AddLabel('<font color="#0bff7e">Goose Better</font> - script'))
+	Groups.Credits:AddLabel('wally & Inori - ui library')
 
 
 Groups.Misc = Tabs.Miscellaneous:AddRightGroupbox('Miscellaneous')
-Groups.Misc:AddLabel(metadata.message or 'no message found!', true)
+	Groups.Misc:AddLabel(metadata.message or 'no message found!', true)
 
-Groups.Misc:AddDivider()
-Groups.Misc:AddButton('Unload script', function() pcall(shared._unload) end)
-Groups.Misc:AddButton('Copy discord', function()
-	if pcall(setclipboard, "https://wally.cool/discord") then
-		UI:Notify('Successfully copied discord link to your clipboard!', 5)
-	end
-end)
+	Groups.Misc:AddDivider()
+	Groups.Misc:AddButton('Unload script', function() pcall(shared._unload) end)
+	Groups.Misc:AddButton('Copy discord', function()
+		if pcall(setclipboard, "https://wally.cool/discord") then
+			UI:Notify('Successfully copied discord link to your clipboard!', 5)
+		end
+	end)
 
-Groups.Misc:AddLabel('Menu toggle'):AddKeyPicker('MenuToggle', { Default = 'Delete', NoUI = true })
+	Groups.Misc:AddLabel('Menu toggle'):AddKeyPicker('MenuToggle', { Default = 'Delete', NoUI = true })
 
-UI.ToggleKeybind = Options.MenuToggle
+	UI.ToggleKeybind = Options.MenuToggle
 
 if type(readfile) == 'function' and type(writefile) == 'function' and type(makefolder) == 'function' and type(isfolder) == 'function' then
 	makefolder('youtube_simulator_z_autofarm')
