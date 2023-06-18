@@ -173,17 +173,13 @@ do
 						client.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
 						task.wait(1)
 						if workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) then
-							repeat
-								if workspace.Studio.Items:FindFirstChild("Shop Teleporter") then
-									client.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
-									task.wait(.5)
-								else
-									if workspace.Studio:FindFirstChild("Door") then
-										client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
-									end
+							if workspace.Studio.Items:FindFirstChild("Shop Teleporter") then
+								client.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
+							else
+								if workspace.Studio:FindFirstChild("Door") then
+									client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
 								end
-								task.wait(0.1)
-							until not workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+							end
 						end
 					end
 					if not client.Character:FindFirstChild("Handle") then
@@ -353,7 +349,7 @@ do
 	local thread = task.spawn(function()
 		while true do
 			task.wait()
-			if Toggles.AutoOpenChests and Toggles.AutoOpenChests.Value then
+			if ((Toggles.AutoOpenChests) and (Toggles.AutoOpenChests.Value)) then
 				UI:Notify("Started opening chests! (make sure to have chest gui open)", 5)
 				local startTime = tick()
 
