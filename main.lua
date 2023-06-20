@@ -120,7 +120,7 @@ while true do
 
 	counter = counter + 1
 	if counter > 6 then
-		fail(string.format('Failed to load game dependencies. Details: %s, %s, %s', type(framework), typeof(scrollHandler), type(network)))
+		fail(string.format('Failed to load game dependencies. Details: %s, %s', typeof((require(game.ReplicatedStorage.Modules.OPOP).PEE)), typeof(clickEvent)))
 	end
 end
 
@@ -175,6 +175,58 @@ do
 						if workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) then
 							if workspace.Studio.Items:FindFirstChild("Shop Teleporter") then
 								client.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
+								set_identity(7)
+								repeat task.wait() until (workspace.Upgrades.Cameras:FindFirstChild("X", true) and workspace.Upgrades.Computers:FindFirstChild("X", true)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+								task.wait(.1)
+								local cameraChildren = workspace.Upgrades.Cameras:GetChildren()
+								local cameras = {}
+								for _, camera in ipairs(cameraChildren) do
+									if camera.a.BrickColor == BrickColor.new("Cyan") then
+										table.insert(cameras, camera)
+									end
+								end
+
+
+								local targetCamera = nil
+								local cameraNumber = 0
+								for _, camera in ipairs(cameras) do
+									if tonumber(camera.Name) > cameraNumber then
+										cameraNumber = tonumber(camera.Name)
+										targetCamera = camera
+									end
+								end
+
+								if targetCamera ~= nil and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
+									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+									local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)), true);
+									if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)))] and ownedCamera then
+										require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)))
+									end
+									game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name))))
+								end
+								task.wait()
+								local computersChildren = workspace.Upgrades.Computers:GetChildren()
+								local computers = {}
+								for _, computer in ipairs(computersChildren) do
+									if computer.a.BrickColor == BrickColor.new("Cyan") then
+										table.insert(computers, computer)
+									end
+								end
+
+
+								local targetComputer = nil
+								local computerNumber = 0
+								for _, computer in ipairs(computers) do
+									if tonumber(computer.Name) > cameraNumber then
+										cameraNumber = tonumber(computer.Name)
+										targetComputer = computer
+									end
+								end
+
+								if targetComputer ~= nil and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
+									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+									game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(targetComputer.Name)), false);
+								end
 							else
 								if workspace.Studio:FindFirstChild("Door") then
 									client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
@@ -182,11 +234,12 @@ do
 							end
 						end
 					end
-					if not client.Character:FindFirstChild("Handle") then
+					set_identity(7)
+					if not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character) then
 						repeat
 							pressButton(client.PlayerGui.Camera.Fr.ImageButton)
 							task.wait()
-						until client.Character:FindFirstChild("Handle") or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+						until require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 					end
 					task.wait()
 					set_identity(7)
@@ -199,7 +252,6 @@ do
 						task.spawn(function()
 							if Options.InputMode.Value == 'virtual input' then
 								virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
-								task.wait()
 								virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
 							else
 								clickEvent:Fire({["UserInputType"] = Enum.UserInputType.Keyboard, ["KeyCode"] = Enum.KeyCode.E})
@@ -371,6 +423,43 @@ do
 				end
 				Toggles.AutoOpenChests:SetValue(false)
 				UI:Notify(string.format('Finished opening chests in %.4f second(s)!', tick() - startTime), 5)
+			end
+		end
+	end)
+	table.insert(shared.callbacks, function()
+		pcall(task.cancel, thread)
+	end)
+end
+
+-- Auto press E
+do
+	local thread = task.spawn(function()
+		while true do
+			task.wait()
+			if ((Toggles.AutoPressE) and (Toggles.AutoPressE.Value)) then
+				task.spawn(function()
+					virtualInputManager:SendKeyEvent(true, Enum.KeyCode.E, false, nil)
+					virtualInputManager:SendKeyEvent(false, Enum.KeyCode.E, false, nil)
+				end)
+			end
+		end
+	end)
+	table.insert(shared.callbacks, function()
+		pcall(task.cancel, thread)
+	end)
+end
+
+-- Auto clicker
+do
+	local thread = task.spawn(function()
+		local centerFrame = client.PlayerGui:WaitForChild("RebirthOptions"):WaitForChild("Frame")
+		while true do
+			task.wait()
+			if ((Toggles.AutoClick) and (Toggles.AutoClick.Value)) then
+				task.spawn(function()
+					virtualInputManager:SendMouseButtonEvent((centerFrame.AbsoluteSize.X - centerFrame.AbsolutePosition.X)/2, (centerFrame.AbsoluteSize.Y - centerFrame.AbsolutePosition.Y)/2, 0, true, game,1)
+					virtualInputManager:SendMouseButtonEvent((centerFrame.AbsoluteSize.X - centerFrame.AbsolutePosition.X)/2, (centerFrame.AbsoluteSize.Y - centerFrame.AbsolutePosition.Y)/2, 0, false, game,1)
+				end)
 			end
 		end
 	end)
@@ -569,10 +658,12 @@ Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 		Tooltip = 'Input method used to press arrows.\n* event fire: fires the click event directly.\n* virtual input: emulates key presses. use if "event fire" does not work.', 
 	})
 	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.025, Rounding = 3, Compact = true, Suffix = 's' })
-	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2, Max = 100, Default = 100, Suffix = '%', Rounding = 0, Compact = true })
+	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
 	Groups.Misc:AddToggle('AutoOpenChests', { Text = 'Auto open chests' })
+	Groups.Misc:AddToggle('AutoClick', { Text = 'Auto click' }):AddKeyPicker('AutoClickBind', { Default = 'Nine', NoUI = true, SyncToggleState = true })
+	Groups.Misc:AddToggle('AutoPressE', { Text = 'Auto press E' }):AddKeyPicker('AutoPressBind', { Default = 'Zero', NoUI = true, SyncToggleState = true })
 
 Groups.Configs = Tabs.Miscellaneous:AddRightGroupbox('Configs')
 Groups.Credits = Tabs.Miscellaneous:AddRightGroupbox('Credits')
