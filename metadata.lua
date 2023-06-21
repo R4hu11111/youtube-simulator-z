@@ -1,5 +1,5 @@
 return {
-	version = '2.3b',
+	version = '2.3d',
 	updated = '6/21/23',
-	message = 'major bug fixes'
+	message = 'minor bug fix'
 }
