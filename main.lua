@@ -44,40 +44,6 @@ local getupvalues = debug.getupvalues or getupvalues;
 
 if type(getupvalues) ~= 'function' then return fail('Unsupported exploit (missing "debug.getupvalues")') end
 
--- free exploit bandaid fix
-if type(getinfo) ~= 'function' then
-	local debug_info = debug.info;
-	if type(debug_info) ~= 'function' then
-		-- if your exploit doesnt have getrenv you have no hope
-		if type(getrenv) ~= 'function' then return fail('Unsupported exploit (missing "getrenv")') end
-		debug_info = getrenv().debug.info
-	end
-	getinfo = function(f)
-		assert(type(f) == 'function', string.format('Invalid argument #1 to debug.getinfo (expected %s got %s', 'function', type(f)))
-		local results = { debug.info(f, 'slnfa') }
-		local _, upvalues = pcall(getupvalues, f)
-		if type(upvalues) ~= 'table' then
-			upvalues = {}
-		end
-		local nups = 0
-		for k in next, upvalues do
-			nups = nups + 1
-		end
-		-- winning code
-		return {
-			source      = '@' .. results[1],
-			short_src   = results[1],
-			what        = results[1] == '[C]' and 'C' or 'Lua',
-			currentline = results[2],
-			name        = results[3],
-			func        = results[4],
-			numparams   = results[5],
-			is_vararg   = results[6], -- 'a' argument returns 2 values :)
-			nups        = nups,     
-		}
-	end
-end
-
 local UI = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/Library.lua")
 local themeManager = urlLoad("https://raw.githubusercontent.com/wally-rblx/LinoriaLib/main/addons/ThemeManager.lua")
 
@@ -125,7 +91,6 @@ while true do
 end
 
 local runService = game:GetService('RunService')
-local userInputService = game:GetService('UserInputService')
 local virtualInputManager = game:GetService('VirtualInputManager')
 
 local pressButton do
@@ -192,61 +157,93 @@ do
 						end
 					end
 					task.wait(.1)
+					set_identity(2)
+					local SDnumber = game.ReplicatedStorage.Remotes.Functions.GetMoneyMode:InvokeServer()
+					local moneyName = SDnumber == 1 and "Money" or "Money" .. tostring(SDnumber)
+					local moneyValue = client:FindFirstChild(moneyName)
+					local nextFloorPrice = math.huge
+					require(game.ReplicatedStorage.Modules.Upgrades)["Display"](SDnumber)
+					require(game.ReplicatedStorage.Modules.Elevator)["Floor"] = (SDnumber)
 					for _, camera in ipairs(workspace.Upgrades.Cameras:GetChildren()) do
+						local cameraNumber = (20 * tonumber(SDnumber - 1) + tonumber(camera.Name))
 						if camera.a.BrickColor == BrickColor.new("Cyan") then
 							if workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1))) then
 								local betterCamera = workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1)))
 								if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
-									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-									local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
-									if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
-										require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+									local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(cameraNumber, true);
+									if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring(cameraNumber)] and ownedCamera then
+										require(game.ReplicatedStorage.Modules.OwnedCameras).new(cameraNumber)
 									end
-									game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
+									game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber(cameraNumber))
 								end
 							else
-								local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-								local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
-								if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
-									require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+								local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(cameraNumber, true);
+								if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring(cameraNumber)] and ownedCamera then
+									require(game.ReplicatedStorage.Modules.OwnedCameras).new(cameraNumber)
 								end
-								game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
+								game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber(cameraNumber))
 							end
+						elseif camera.Name == "20" and camera.a.BrickColor == BrickColor.new("Bright green") then
+							nextFloorPrice = 0
+							set_identity(2)
+							nextFloorPrice += tonumber(require(game.ReplicatedStorage.Modules.Formula).PricePerCamera(cameraNumber + 1))
 						end
 					end
 
 					for _, computer in ipairs(workspace.Upgrades.Computers:GetChildren()) do
+						local computerNumber = (20 * tonumber(SDnumber - 1) + tonumber(computer.Name))
 						if computer.a.BrickColor == BrickColor.new("Cyan") then
 							if workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1))) then
 								local betterComputer = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
 								if betterComputer.a.BrickColor == BrickColor.new("Persimmon") then
-									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-									game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
+									game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(computerNumber, false);
 								end
 							else
-								local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-								game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
+								game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(computerNumber, false);
 							end
+						elseif computer.Name == "20" and computer.a.BrickColor == BrickColor.new("Bright green") then
+							set_identity(2)
+							nextFloorPrice += tonumber(require(game.ReplicatedStorage.Modules.Formula).PricePerComputer(computerNumber + 1))
 						end
 					end
-					local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-					game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("BUYSD"):InvokeServer(((Options.SDPercentageToBuy.Value)/100), SDnumber)
+
+					if moneyValue.Value > nextFloorPrice then
+						if SDnumber ~= 8 then
+							set_identity(2)
+
+							require(game.ReplicatedStorage.Modules.Upgrades)["Display"](SDnumber + 1)
+							require(game.ReplicatedStorage.Modules.Elevator)["Floor"] = (SDnumber + 1)
+							SDnumber = game.ReplicatedStorage.Remotes.Functions.GetMoneyMode:InvokeServer() + 1
+
+							local cameraNumber = (20 * tonumber(SDnumber - 1) + 1)
+							local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(cameraNumber, true);
+							if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring(cameraNumber)] and ownedCamera then
+								require(game.ReplicatedStorage.Modules.OwnedCameras).new(cameraNumber)
+							end
+							game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber(cameraNumber))
+
+							local computerNumber = (20 * tonumber(SDnumber - 1) + 1)
+							game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer(computerNumber, false);
+						end
+					end
+					SDnumber = game.ReplicatedStorage.Remotes.Functions.GetMoneyMode:InvokeServer()
+					game.ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("BUYSD"):InvokeServer(((Options.SDPercentageToBuy.Value)/100), SDnumber)
 					task.wait()
 					set_identity(2)
 					task.wait()
 					if ((require(game.ReplicatedStorage.Modules.GetCamera).Camera == nil) or (not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) then
 						repeat
 							pressButton(client.PlayerGui.Camera.Fr.ImageButton)
-							task.wait()
+							task.wait(.1)
 						until ((require(game.ReplicatedStorage.Modules.GetCamera).Camera ~= nil) and (require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 					end
 					task.wait()
 					set_identity(7)
 					repeat
 						task.spawn(function()
-							game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailStart:FireServer()
+							game.ReplicatedStorage.Remotes.Events.ThumbnailStart:FireServer()
 							task.wait()
-							game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
+							game.ReplicatedStorage.Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
 						end)
 						task.spawn(function()
 							if Options.InputMode.Value == 'virtual input' then
@@ -261,9 +258,9 @@ do
 				end
 				task.wait()
 				if not workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
-					game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailStart:FireServer()
+					game.ReplicatedStorage.Remotes.Events.ThumbnailStart:FireServer()
 					task.wait()
-					game:GetService("ReplicatedStorage").Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
+					game.ReplicatedStorage.Remotes.Events.ThumbnailEnd:FireServer({["Color"] = tonumber(string.format("%.3f", math.random(100, 600) * .001)), ["Pic"] = math.random(2, 7), ["Pose"] = math.random(3, 4), ["Arrow"] = math.random(1, 4)}, 'Thumbnail_1')
 					task.wait()
 					repeat
 						game.ReplicatedStorage.Events._EnterHouse:Fire()
@@ -337,14 +334,14 @@ do
 						editingVideoTL.BackgroundTransparency = 0.5
 						editingVideoTL.BorderSizePixel = 0
 						editingVideoTL.Text = "Editing video."
-						game:GetService("ReplicatedStorage").Remotes.Functions.BeginVIdeo:InvokeServer()
+						game.ReplicatedStorage.Remotes.Functions.BeginVIdeo:InvokeServer()
 						task.wait(.1)
 						local video = game.ReplicatedStorage.Remotes.Functions.BeginVIdeo:InvokeServer()
 						local videoLength = 0
 						set_identity(2)
 						local currentComptuer = require(game.ReplicatedStorage.Modules.Computers)[require(game.ReplicatedStorage.Modules.CurrentComputer).Computer]
 						local currentComputerSDPer = require(game.ReplicatedStorage.Modules.Formula).SDPerComputer(currentComptuer)
-						local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+						local SDnumber = game.ReplicatedStorage.Remotes.Functions.GetMoneyMode:InvokeServer()
 						local SDname = SDnumber == 1 and "SD" or "SD" .. tostring(SDnumber)
 						local SDestimation = client[SDname].Value
 						if videoLength < math.ceil(SDestimation / currentComputerSDPer) then
@@ -381,7 +378,7 @@ do
 						game.ReplicatedStorage.Remotes.Events.Export:FireServer(extends, video, videoLength, 'Video_1')
 					end
 					task.wait()
-					game:GetService("ReplicatedStorage").Remotes.Events.Upload:FireServer('Video_1', 'Thumbnail_1', 'Video_1')
+					game.ReplicatedStorage.Remotes.Events.Upload:FireServer('Video_1', 'Thumbnail_1', 'Video_1')
 					task.wait(1)
 					if client.PlayerGui:FindFirstChild("editingVideoGui") then
 						client.PlayerGui:FindFirstChild("editingVideoGui"):Destroy()
@@ -415,7 +412,7 @@ do
 				if chestGui.C.C.TextLabel.TextLabel.TextLabel.Text ~= "0" then
 					set_identity(2)
 					repeat
-						require(game.ReplicatedStorage.Modules.Float).new(openChestButton):Click()
+						pressButton(openChestButton)
 						task.wait()
 					until chestGui.C.C.TextLabel.TextLabel.TextLabel.Text == "0" or ((not Toggles.AutoOpenChests) or (not Toggles.AutoOpenChests.Value))
 					set_identity(7)
