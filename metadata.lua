@@ -1,5 +1,5 @@
 return {
-	version = '2.4a',
+	version = '2.4b',
 	updated = '6/21/23',
-	message = 'minor bug fixes'
+	message = 'buying sd percentage'
 }
