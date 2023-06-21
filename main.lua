@@ -167,7 +167,7 @@ do
 		while true do
 			task.wait()
 			if ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
-				if client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X < (-0.51 + ((Options.SDPercentage.Value) / 100)) and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
+				if client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X < (-0.51 + ((Options.VideoSDPercentage.Value) / 100)) and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
 					if workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) then
 						task.wait(1)
 						client.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
@@ -177,56 +177,61 @@ do
 								client.Character:PivotTo(workspace.Studio.Items:FindFirstChild("Shop Teleporter"):GetPivot() * CFrame.new(0, 7, 0))
 								set_identity(7)
 								repeat task.wait() until (workspace.Upgrades.Cameras:FindFirstChild("X", true) and workspace.Upgrades.Computers:FindFirstChild("X", true)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
-								task.wait(.1)
-								for _, camera in ipairs(workspace.Upgrades.Cameras:GetChildren()) do
-									if camera.a.BrickColor == BrickColor.new("Cyan") then
-										if workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1))) then
-											local betterCamera = workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1)))
-											if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
-												local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-												local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
-												if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
-													require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
-												end
-												game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
-											end
-										else
-											local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-											local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
-											if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
-												require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
-											end
-											game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
-										end
-									end
-								end
-
-								for _, computer in ipairs(workspace.Upgrades.Computers:GetChildren()) do
-									if computer.a.BrickColor == BrickColor.new("Cyan") then
-										if workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1))) then
-											local betterComputer = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
-											if betterComputer.a.BrickColor == BrickColor.new("Persimmon") then
-												local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-												game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
-											end
-										else
-											local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-											game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
-										end
-									end
-								end
 							else
 								if workspace.Studio:FindFirstChild("Door") then
 									repeat
 										client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
+										task.wait()
 									until (not workspace.Studio:FindFirstChild("Door")) or (((getsenv(client.PlayerScripts.Ads)).isOutside()) == true)
 									repeat
 										game.ReplicatedStorage.Events._EnterUpgrades:Fire()
-									until (((getsenv(client.PlayerScripts.Ads)).isOutside()) == true)
+										task.wait()
+									until (((getsenv(client.PlayerScripts.Ads)).isOutside()) == false)
 								end
 							end
 						end
 					end
+					task.wait(.1)
+					for _, camera in ipairs(workspace.Upgrades.Cameras:GetChildren()) do
+						if camera.a.BrickColor == BrickColor.new("Cyan") then
+							if workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1))) then
+								local betterCamera = workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1)))
+								if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
+									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+									local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
+									if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
+										require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+									end
+									game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
+								end
+							else
+								local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+								local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
+								if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
+									require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+								end
+								game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
+							end
+						end
+					end
+
+					for _, computer in ipairs(workspace.Upgrades.Computers:GetChildren()) do
+						if computer.a.BrickColor == BrickColor.new("Cyan") then
+							if workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1))) then
+								local betterComputer = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
+								if betterComputer.a.BrickColor == BrickColor.new("Persimmon") then
+									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+									game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
+								end
+							else
+								local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+								game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
+							end
+						end
+					end
+					local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+					game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("Functions"):WaitForChild("BUYSD"):InvokeServer(((Options.SDPercentageToBuy.Value)/100), SDnumber)
+					task.wait()
 					set_identity(2)
 					task.wait()
 					if ((require(game.ReplicatedStorage.Modules.GetCamera).Camera == nil) or (not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) then
@@ -252,7 +257,7 @@ do
 							end
 						end)
 						task.wait(Options.ClickDelay.Value)
-					until client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X >= (-0.51 + ((Options.SDPercentage.Value) / 100)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+					until client.PlayerGui.MainMenu.C.C.UIGradient.Offset.X >= (-0.51 + ((Options.VideoSDPercentage.Value) / 100)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 				end
 				task.wait()
 				if not workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
@@ -652,7 +657,8 @@ Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 		Tooltip = 'Input method used to click for camera.\n* virtual input: emulates key presses.\n* event fire: fires the click event directly. use if "virtual input" does not work.', 
 	})
 	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.000, Rounding = 3, Compact = true, Suffix = 's' })
-	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
+	Groups.AutoFarm:AddSlider('VideoSDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
+	Groups.AutoFarm:AddSlider('SDPercentageToBuy',		{ Text = 'SD Percentag To Buy', Min = 0.000, Max = 100.000, Default = 10.000, Suffix = '%', Rounding = 3, Compact = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
 	Groups.Misc:AddToggle('AutoOpenChests', { Text = 'Auto open chests' })
