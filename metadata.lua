@@ -1,5 +1,5 @@
 return {
-	version = '2.4b',
+	version = '2.4c',
 	updated = '6/21/23',
-	message = 'buying sd percentage'
+	message = 'chests stop auto opening once toggled off'
 }
