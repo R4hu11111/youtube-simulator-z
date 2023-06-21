@@ -417,7 +417,7 @@ do
 					repeat
 						require(game.ReplicatedStorage.Modules.Float).new(openChestButton):Click()
 						task.wait()
-					until chestGui.C.C.TextLabel.TextLabel.TextLabel.Text == "0"
+					until chestGui.C.C.TextLabel.TextLabel.TextLabel.Text == "0" or ((not Toggles.AutoOpenChests) or (not Toggles.AutoOpenChests.Value))
 					set_identity(7)
 				end
 				Toggles.AutoOpenChests:SetValue(false)
