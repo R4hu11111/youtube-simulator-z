@@ -178,54 +178,32 @@ do
 								set_identity(7)
 								repeat task.wait() until (workspace.Upgrades.Cameras:FindFirstChild("X", true) and workspace.Upgrades.Computers:FindFirstChild("X", true)) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 								task.wait(.1)
-								local cameraChildren = workspace.Upgrades.Cameras:GetChildren()
-								local cameras = {}
-								for _, camera in ipairs(cameraChildren) do
+								for _, camera in ipairs(workspace.Upgrades.Cameras:GetChildren()) do
 									if camera.a.BrickColor == BrickColor.new("Cyan") then
-										table.insert(cameras, camera)
+										if workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1))) then
+											local betterCamera = workspace.Upgrades.Cameras:FindFirstChild(tostring((tonumber(camera.Name) + 1)))
+											if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
+												local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+												local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
+												if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
+													require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+												end
+												game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
+											end
+										end
 									end
 								end
 
-
-								local targetCamera = nil
-								local cameraNumber = 0
-								for _, camera in ipairs(cameras) do
-									if tonumber(camera.Name) > cameraNumber then
-										cameraNumber = tonumber(camera.Name)
-										targetCamera = camera
-									end
-								end
-
-								if targetCamera ~= nil and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
-									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-									local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)), true);
-									if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)))] and ownedCamera then
-										require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name)))
-									end
-									game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(targetCamera.Name))))
-								end
-								task.wait()
-								local computersChildren = workspace.Upgrades.Computers:GetChildren()
-								local computers = {}
-								for _, computer in ipairs(computersChildren) do
+								for _, computer in ipairs(workspace.Upgrades.Computers:GetChildren()) do
 									if computer.a.BrickColor == BrickColor.new("Cyan") then
-										table.insert(computers, computer)
+										if workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1))) then
+											local betterCamera = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
+											if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
+												local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+												game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
+											end
+										end
 									end
-								end
-
-
-								local targetComputer = nil
-								local computerNumber = 0
-								for _, computer in ipairs(computers) do
-									if tonumber(computer.Name) > cameraNumber then
-										cameraNumber = tonumber(computer.Name)
-										targetComputer = computer
-									end
-								end
-
-								if targetComputer ~= nil and ((Toggles.AutoFarm) and (Toggles.AutoFarm.Value)) then
-									local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
-									game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(targetComputer.Name)), false);
 								end
 							else
 								if workspace.Studio:FindFirstChild("Door") then
