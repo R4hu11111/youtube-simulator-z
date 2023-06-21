@@ -190,6 +190,13 @@ do
 												end
 												game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
 											end
+										else
+											local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+											local ownedCamera = game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)), true);
+											if not require(game.ReplicatedStorage.Modules.OwnedCameras).Owned[tostring((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))] and ownedCamera then
+												require(game.ReplicatedStorage.Modules.OwnedCameras).new((20 * tonumber(SDnumber - 1) + tonumber(camera.Name)))
+											end
+											game.ReplicatedStorage.Events.UpdateCam:Fire(tonumber((20 * tonumber(SDnumber - 1) + tonumber(camera.Name))))
 										end
 									end
 								end
@@ -197,17 +204,25 @@ do
 								for _, computer in ipairs(workspace.Upgrades.Computers:GetChildren()) do
 									if computer.a.BrickColor == BrickColor.new("Cyan") then
 										if workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1))) then
-											local betterCamera = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
-											if betterCamera.a.BrickColor == BrickColor.new("Persimmon") then
+											local betterComputer = workspace.Upgrades.Computers:FindFirstChild(tostring((tonumber(computer.Name) + 1)))
+											if betterComputer.a.BrickColor == BrickColor.new("Persimmon") then
 												local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
 												game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
 											end
+										else
+											local SDnumber = game:GetService("ReplicatedStorage").Remotes.Functions.GetMoneyMode:InvokeServer()
+											game.ReplicatedStorage.Remotes.Functions.BuyUpgrade:InvokeServer((20 * tonumber(SDnumber - 1) + tonumber(computer.Name)), false);
 										end
 									end
 								end
 							else
 								if workspace.Studio:FindFirstChild("Door") then
-									client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
+									repeat
+										client.Character:PivotTo(workspace.Studio.Door.W:GetPivot())
+									until (not workspace.Studio:FindFirstChild("Door")) or (((getsenv(client.PlayerScripts.Ads)).isOutside()) == true)
+									repeat
+										game.ReplicatedStorage.Events._EnterUpgrades:Fire()
+									until (((getsenv(client.PlayerScripts.Ads)).isOutside()) == true)
 								end
 							end
 						end
@@ -632,11 +647,11 @@ Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 	Groups.AutoFarm:AddDropdown('InputMode', {
 		Text = 'Input mode', 
 		Compact = true, 
-		Default = 'event fire', 
-		Values = { 'event fire', 'virtual input' }, 
-		Tooltip = 'Input method used to press arrows.\n* event fire: fires the click event directly.\n* virtual input: emulates key presses. use if "event fire" does not work.', 
+		Default = 'virtual input', 
+		Values = { 'virtual input', 'event fire' }, 
+		Tooltip = 'Input method used to click for camera.\n* virtual input: emulates key presses.\n* event fire: fires the click event directly. use if "virtual input" does not work.', 
 	})
-	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.025, Rounding = 3, Compact = true, Suffix = 's' })
+	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.000, Rounding = 3, Compact = true, Suffix = 's' })
 	Groups.AutoFarm:AddSlider('SDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
