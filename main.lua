@@ -214,11 +214,11 @@ do
 					end
 					set_identity(2)
 					task.wait()
-					if not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character) then
+					if ((require(game.ReplicatedStorage.Modules.GetCamera).Camera == nil) or (not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) then
 						repeat
 							pressButton(client.PlayerGui.Camera.Fr.ImageButton)
 							task.wait()
-						until require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+						until ((require(game.ReplicatedStorage.Modules.GetCamera).Camera ~= nil) and (require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 					end
 					task.wait()
 					set_identity(7)
