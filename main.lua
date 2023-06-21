@@ -234,7 +234,8 @@ do
 							end
 						end
 					end
-					set_identity(7)
+					set_identity(2)
+					task.wait()
 					if not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character) then
 						repeat
 							pressButton(client.PlayerGui.Camera.Fr.ImageButton)
