@@ -207,8 +207,8 @@ do
 						end
 					end
 
-					if moneyValue.Value > nextFloorPrice then
-						if SDnumber ~= 8 then
+					if moneyValue.Value > nextFloorPrice and (Options.FloorToStop.Value) ~= 1 then
+						if SDnumber ~= 8 and ((SDnumber + 1) < (Options.FloorToStop.Value)) then
 							set_identity(2)
 
 							require(game.ReplicatedStorage.Modules.Upgrades)["Display"](SDnumber + 1)
@@ -656,6 +656,7 @@ Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.000, Rounding = 3, Compact = true, Suffix = 's' })
 	Groups.AutoFarm:AddSlider('VideoSDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
 	Groups.AutoFarm:AddSlider('SDPercentageToBuy',		{ Text = 'SD Percentag To Buy', Min = 0.000, Max = 100.000, Default = 10.000, Suffix = '%', Rounding = 3, Compact = true })
+	Groups.AutoFarm:AddSlider('FloorToStop',			{ Text = 'Floor To Stop At', Min = 1, Max = 8, Default = 8, Rounding = 0, Compact = true, HideMax = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
 	Groups.Misc:AddToggle('AutoOpenChests', { Text = 'Auto open chests' })
