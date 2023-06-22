@@ -208,7 +208,7 @@ do
 					end
 
 					if moneyValue.Value > nextFloorPrice and (Options.FloorToStop.Value) ~= 1 then
-						if SDnumber ~= 8 and ((SDnumber + 1) < (Options.FloorToStop.Value)) then
+						if SDnumber ~= 8 and ((SDnumber) < (Options.FloorToStop.Value)) then
 							set_identity(2)
 
 							require(game.ReplicatedStorage.Modules.Upgrades)["Display"](SDnumber + 1)
