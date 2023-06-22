@@ -231,11 +231,11 @@ do
 					task.wait()
 					set_identity(2)
 					task.wait()
-					if ((require(game.ReplicatedStorage.Modules.GetCamera).Camera == nil) or (not require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) then
+					if (not client.Character:FindFirstChild("Handle")) then
 						repeat
 							pressButton(client.PlayerGui.Camera.Fr.ImageButton)
-							task.wait(.1)
-						until ((require(game.ReplicatedStorage.Modules.GetCamera).Camera ~= nil) and (require(game.ReplicatedStorage.Modules.GetCamera).Camera:IsDescendantOf(client.Character))) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
+							task.wait()
+						until client.Character:FindFirstChild("Handle")
 					end
 					task.wait()
 					set_identity(7)
