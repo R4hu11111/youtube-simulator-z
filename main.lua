@@ -264,8 +264,6 @@ do
 					task.wait()
 					repeat
 						game.ReplicatedStorage.Events._EnterHouse:Fire()
-						task.wait(1)
-						client.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
 						task.wait(0.1)
 					until workspace.Studio.Items:FindFirstChildWhichIsA("Seat", true) or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
 					local replaceWithBest = nil
@@ -298,17 +296,10 @@ do
 									end
 								end
 								pressButton(replaceWithBest)
-								repeat
-									client.Character:PivotTo(Seat:GetPivot())
-									task.wait(1)
-									client.Character.PrimaryPart.Velocity = Vector3.new(50, 50, 50)
-									task.wait(1)
-									client.Character.PrimaryPart.Velocity = Vector3.new(-50, 50, -50)
-									task.wait(1)
-								until client.Character:FindFirstChildOfClass("Humanoid").Sit == true or ((not Toggles.AutoFarm) or (not Toggles.AutoFarm.Value))
-								for _, ChairInstance in ipairs(Chair:GetDescendants()) do
-									if ChairInstance:IsA("BasePart") then
-										ChairInstance.CanCollide = true
+								set_identity(2)
+								for _, v in ipairs(workspace.Studio.Items:GetChildren()) do
+									if v.Name:match("Computer_") then
+										getsenv(client.PlayerGui.Computer.Frame.LocalScript)["turnOn"](v.Name)
 									end
 								end
 							end
@@ -382,6 +373,12 @@ do
 					task.wait(1)
 					if client.PlayerGui:FindFirstChild("editingVideoGui") then
 						client.PlayerGui:FindFirstChild("editingVideoGui"):Destroy()
+					end
+					set_identity(2)
+					for _, v in ipairs(workspace.Studio.Items:GetChildren()) do
+						if v.Name:match("Computer_") then
+							getsenv(client.PlayerGui.Computer.Frame.LocalScript)["turnOff"](v.Name)
+						end
 					end
 				end
 			end
@@ -655,7 +652,7 @@ Groups.AutoFarm = Tabs.Main:AddLeftGroupbox('AutoFarm')
 	})
 	Groups.AutoFarm:AddSlider('ClickDelay',			{ Text = 'Click delay', Min = 0.000, Max = 1.000, Default = 0.000, Rounding = 3, Compact = true, Suffix = 's' })
 	Groups.AutoFarm:AddSlider('VideoSDPercentage',		{ Text = 'Video SD Percentage', Min = 2.000, Max = 100.000, Default = 100.000, Suffix = '%', Rounding = 3, Compact = true })
-	Groups.AutoFarm:AddSlider('SDPercentageToBuy',		{ Text = 'SD Percentag To Buy', Min = 0.000, Max = 100.000, Default = 10.000, Suffix = '%', Rounding = 3, Compact = true })
+	Groups.AutoFarm:AddSlider('SDPercentageToBuy',		{ Text = 'SD Percentage To Buy', Min = 0.000, Max = 100.000, Default = 10.000, Suffix = '%', Rounding = 3, Compact = true })
 	Groups.AutoFarm:AddSlider('FloorToStop',			{ Text = 'Floor To Stop At', Min = 1, Max = 8, Default = 8, Rounding = 0, Compact = true, HideMax = true })
 
 Groups.Misc = Tabs.Main:AddRightGroupbox('Misc')
