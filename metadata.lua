@@ -1,5 +1,5 @@
 return {
-	version = '2.4d',
+	version = '2.5a',
 	updated = '6/21/23',
-	message = 'auto elevator increase'
+	message = 'added floor to stop at for auto elevator'
 }
